@@ -188,11 +188,6 @@ public class EMExoPlayer implements
         }
     }
 
-    // STOP todo
-    //  * 100% buffered
-    //  * No media (or stopped, etc.)
-    // Start
-    //  * Media is added and prepared
     public void setBufferUpdateListener(@Nullable OnBufferUpdateListener listener) {
         this.bufferUpdateListener = listener;
         setBufferRepeaterStarted(listener != null);
@@ -249,7 +244,7 @@ public class EMExoPlayer implements
         }
 
         Map<Integer, List<MediaFormat>> trackMap = new ArrayMap<>();
-        int[] trackTypes = new int[] {RENDER_AUDIO, RENDER_VIDEO, RENDER_CLOSED_CAPTION, RENDER_TIMED_METADATA};
+        int[] trackTypes = new int[]{RENDER_AUDIO, RENDER_VIDEO, RENDER_CLOSED_CAPTION, RENDER_TIMED_METADATA};
 
         //Populates the map with all available tracks
         for (int type : trackTypes) {
@@ -693,7 +688,8 @@ public class EMExoPlayer implements
             //Because the playWhenReady isn't a state in itself, rather a flag to a state we will ignore informing of
             // see events when that is the only change.  Additionally, on some devices we get states ordered as
             // [seeking, ready, buffering, ready] while on others we get [seeking, buffering, ready]
-            boolean informSeekCompletion = stateStore.matchesHistory(new int[]{StateStore.STATE_SEEKING, ExoPlayer.STATE_BUFFERING, ExoPlayer.STATE_READY}, true);
+            boolean informSeekCompletion = stateStore.matchesHistory(new int[]{StateStore.STATE_SEEKING, ExoPlayer.STATE_READY}, true);
+            informSeekCompletion |= stateStore.matchesHistory(new int[]{StateStore.STATE_SEEKING, ExoPlayer.STATE_BUFFERING, ExoPlayer.STATE_READY}, true);
             informSeekCompletion |= stateStore.matchesHistory(new int[]{StateStore.STATE_SEEKING, ExoPlayer.STATE_READY, ExoPlayer.STATE_BUFFERING, ExoPlayer.STATE_READY}, true);
 
             for (ExoPlayerListener listener : listeners) {

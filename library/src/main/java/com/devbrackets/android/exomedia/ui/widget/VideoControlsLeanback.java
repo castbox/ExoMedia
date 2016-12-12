@@ -130,6 +130,13 @@ public class VideoControlsLeanback extends VideoControls {
     }
 
     @Override
+    public void setRewindDrawable(Drawable drawable) {
+        if (rewindButton != null) {
+            rewindButton.setImageDrawable(drawable);
+        }
+    }
+
+    @Override
     public void setFastForwardImageResource(@DrawableRes int resourceId) {
         if (fastForwardButton == null) {
             return;
@@ -139,6 +146,13 @@ public class VideoControlsLeanback extends VideoControls {
             fastForwardButton.setImageResource(resourceId);
         } else {
             fastForwardButton.setImageDrawable(defaultFastForwardDrawable);
+        }
+    }
+
+    @Override
+    public void setFastForwardDrawable(Drawable drawable) {
+        if (fastForwardButton != null) {
+            fastForwardButton.setImageDrawable(drawable);
         }
     }
 
@@ -424,8 +438,11 @@ public class VideoControlsLeanback extends VideoControls {
 
             switch (keyCode) {
                 case KeyEvent.KEYCODE_BACK:
-                    if (isVisible) {
+                    if (isVisible && canViewHide && !isLoading) {
                         hideDelayed(0);
+                        return true;
+                    } else if (controlsParent.getAnimation() != null) {
+                        //This occurs if we are animating the hide or show of the controls
                         return true;
                     }
                     break;
@@ -533,9 +550,9 @@ public class VideoControlsLeanback extends VideoControls {
                 return false;
             }
 
-            int newPosition = videoView.getCurrentPosition() - FAST_FORWARD_REWIND_AMOUNT;
-            if (newPosition < 0) {
-                newPosition = 0;
+            int newPosition = videoView.getCurrentPosition() + FAST_FORWARD_REWIND_AMOUNT;
+            if (newPosition > progressBar.getMax()) {
+                newPosition = progressBar.getMax();
             }
 
             performSeek(newPosition);
@@ -548,9 +565,9 @@ public class VideoControlsLeanback extends VideoControls {
                 return false;
             }
 
-            int newPosition = videoView.getCurrentPosition() + FAST_FORWARD_REWIND_AMOUNT;
-            if (newPosition > progressBar.getMax()) {
-                newPosition = progressBar.getMax();
+            int newPosition = videoView.getCurrentPosition() - FAST_FORWARD_REWIND_AMOUNT;
+            if (newPosition < 0) {
+                newPosition = 0;
             }
 
             performSeek(newPosition);
